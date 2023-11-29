@@ -1,9 +1,23 @@
 package io;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +28,18 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 /**
  * Cette classe propose différentes fonctions permettant de créer une interface
@@ -605,7 +630,7 @@ public class Fenetre implements ActionListener {
 		try {
 			image = imagesParChemin.get(cheminImage);
 			if (image == null) {
-				image = ImageIO.read(new File(cheminImage));
+				image = ImageIO.read(Fenetre.class.getClassLoader().getResourceAsStream(cheminImage));
 				imagesParChemin.put(cheminImage, image);
 			}
 		} catch (IOException e) {

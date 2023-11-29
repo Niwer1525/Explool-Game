@@ -17,7 +17,7 @@ public class SixHumans implements Auditeur {
 	private static final int EMPTY = 0;
 	private static final int PLAYER = 1;
 	private static final int OBJECTIVE = 7;
-
+	
 	// Vars
 	private static Fenetre window;
 	int[][] grid = new int[10][10];
