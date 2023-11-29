@@ -11,7 +11,7 @@ import io.Random;
 public class SixHumans implements Auditeur {
 
 	// Consts
-	private static final String IMAGE_FOLDER = "img\\";
+	private static final String IMAGE_FOLDER = "/img/";
 	private static final int CELL_SIZE = 48;
 	private static final int WALL = -1;
 	private static final int EMPTY = 0;

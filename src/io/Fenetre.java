@@ -19,6 +19,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -624,13 +625,14 @@ public class Fenetre implements ActionListener {
 	public void dessinerImage(String cheminImage, int x, int y, int largeur, int hauteur) {
 		panneau.dessinerImage(getImage(cheminImage), new Position(y, x), new Dimension(largeur, hauteur));
 	}
-
+	
 	private Image getImage(String cheminImage) {
 		Image image = null;
 		try {
 			image = imagesParChemin.get(cheminImage);
+			InputStream stream = Fenetre.class.getResourceAsStream(cheminImage);
 			if (image == null) {
-				image = ImageIO.read(Fenetre.class.getClassLoader().getResourceAsStream(cheminImage));
+				image = ImageIO.read(stream);
 				imagesParChemin.put(cheminImage, image);
 			}
 		} catch (IOException e) {
