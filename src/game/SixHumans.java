@@ -21,7 +21,7 @@ public class SixHumans implements Auditeur {
 	// Vars
 	private static Fenetre window;
 	int[][] grid = new int[10][10];
-	int iPlayer, jPlayer;
+	int[][] positions = new int[10][2];
 
 	public static void main(String[] args) {
 		/* Creating the window */
@@ -32,7 +32,7 @@ public class SixHumans implements Auditeur {
 		game.init();
 
 		/* Display the frame itself */
-		window.setAuditeur(game);
+		window.setAuditeur(game, 1000);
 		window.afficher();
 	}
 
@@ -44,8 +44,10 @@ public class SixHumans implements Auditeur {
 		placeObject(OBJECTIVE);
 		placeObject(WALL, 10);
 		int[] playerCoords = placeObject(PLAYER);
-		iPlayer = playerCoords[0];
-		jPlayer = playerCoords[1];
+		positions[PLAYER][0] = playerCoords[0];
+		positions[PLAYER][1] = playerCoords[1];
+
+		for(int i = 2; i < OBJECTIVE; i++) placeObject(i);
 
 		/* Show the grid */
 		displayGrid();
@@ -85,22 +87,23 @@ public class SixHumans implements Auditeur {
 		window.effacerDessins();
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
-				// If i = 1 et j = 2 -> Then the image should display in (96 ; 48)
+				// If i = 1 & j = 2 -> Then the image should display in (96 ; 48)
 				int x = j * CELL_SIZE;
 				int y = i * CELL_SIZE;
-				// Afficher le sol
-				window.dessinerImage(IMAGE_FOLDER + "sol.png", x, y, CELL_SIZE, CELL_SIZE);
+				// Display the ground
+				window.dessinerImage(IMAGE_FOLDER + "ground.png", x, y, CELL_SIZE, CELL_SIZE);
 				if (grid[i][j] == OBJECTIVE) {
-					// Afficher l'objectif
-					window.dessinerImage(IMAGE_FOLDER + "objectif.png", x, y, CELL_SIZE, CELL_SIZE);
-				}
-				if(grid[i][j] == WALL) {
-					// Afficher l'obstacle
-					window.dessinerImage(IMAGE_FOLDER + "mur.png", x, y, CELL_SIZE, CELL_SIZE);
-				}
-				if (grid[i][j] == PLAYER) {
-					// Afficher le personnage
-					window.dessinerImage(IMAGE_FOLDER + "personnage1.png", x, y, CELL_SIZE, CELL_SIZE);
+					// Display the objective
+					window.dessinerImage(IMAGE_FOLDER + "objective.png", x, y, CELL_SIZE, CELL_SIZE);
+				} else if(grid[i][j] == WALL) {
+					// Display walls
+					window.dessinerImage(IMAGE_FOLDER + "wall.png", x, y, CELL_SIZE, CELL_SIZE);
+				} else if (grid[i][j] == PLAYER) {
+					// Display the player
+					window.dessinerImage(IMAGE_FOLDER + "player.png", x, y, CELL_SIZE, CELL_SIZE);
+				} else if(grid[i][j] != EMPTY) {
+					// Display the humans
+					window.dessinerImage(IMAGE_FOLDER + "entity" + (grid[i][j] - 1) + ".png", x, y, CELL_SIZE, CELL_SIZE);
 				}
 			}
 		}
@@ -109,34 +112,41 @@ public class SixHumans implements Auditeur {
 
 	@Override
 	public void executerAction(Fenetre instance, String elementName, ActionFenetre action, String value) {
-		if (action == ActionFenetre.PRESSION_TOUCHE) {
-			switch (value) {
-			case "Haut", "Z" -> movePlayer(-1, 0);
-			case "Droite", "D" -> movePlayer(0, 1);
-			case "Bas", "S" -> movePlayer(1, 0);
-			case "Gauche", "Q" -> movePlayer(0, -1);
+		if(action == ActionFenetre.MINUTEUR) {
+			/* Move the humans */
+			for(int i = 2; i < OBJECTIVE; i++) {
+				int deltaI = Random.randomize(2) - 1;
+				int deltaJ = Random.randomize(2) - 1;
+				moveEntity(deltaI, deltaJ, i);
 			}
-			displayGrid();
+		} else if (action == ActionFenetre.PRESSION_TOUCHE) {
+			switch (value) {
+			case "Z", "Up" -> moveEntity(-1, 0, PLAYER);
+			case "D", "Right" -> moveEntity(0, 1, PLAYER);
+			case "S", "Down" -> moveEntity(1, 0, PLAYER);
+			case "Q", "Left" -> moveEntity(0, -1, PLAYER);
+			}
 		}
+		displayGrid();
 	}
 
 	/**
-	 * Move the player
+	 * Move entity on the grid
 	 * @param deltaI The value on the y axis (If you want to move up, deltaI = -1 and if you want to move down, deltaI = 1)
 	 * @param deltaJ The value on the x axis (If you want to move left, deltaJ = -1 and if you want to move right, deltaJ = 1)
 	 */
-	public void movePlayer(int deltaI, int deltaJ) {
+	public void moveEntity(int deltaI, int deltaJ, int OBJECT_ID) {
 		/* Get the next cell */
-		int i = (iPlayer + deltaI + grid.length) % grid.length;
-		int j = (jPlayer + deltaJ + grid[iPlayer].length) % grid[iPlayer].length;
+		int i = (positions[OBJECT_ID][0] + deltaI + grid.length) % grid.length;
+		int j = (positions[OBJECT_ID][1] + deltaJ + grid[positions[OBJECT_ID][0]].length) % grid[positions[OBJECT_ID][0]].length;
 
 		/* If it's a wall, then prevent the movement */
-		if(grid[i][j] == WALL) return;
-		
-		/* Move the player */
-		grid[iPlayer][jPlayer] = EMPTY;
-		iPlayer = i;
-		jPlayer = j;
-		grid[iPlayer][jPlayer] = PLAYER;
+		if(grid[i][j] == EMPTY || grid[i][j] == OBJECTIVE) {
+			/* Move the player */
+			grid[ positions[OBJECT_ID][0] ][ positions[OBJECT_ID][1] ] = EMPTY;
+			positions[OBJECT_ID][0] = i;
+			positions[OBJECT_ID][1] = j;
+			grid[ positions[OBJECT_ID][0] ][ positions[OBJECT_ID][1] ] = OBJECT_ID;
+		}
 	}
 }
