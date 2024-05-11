@@ -1,4 +1,4 @@
-## The HELMo Game
+## The Expool (Explosion-School) Game
 
 We've create the most basic game I ever seen.
 
